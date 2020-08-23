@@ -1,6 +1,8 @@
-import discord
-from discord.ext import commands
+import discord;
+from discord.ext import commands;
+import os;
 
+RIRIKSU = os.environ.get("RIRIKSU");
 client = discord.Client();
 
 @client.event
@@ -12,8 +14,11 @@ async def on_message(message):
 	if message.author == client.user:
 		return
 
-	if message.content.startswith('.uwu '):
-		messageToSend = message.content[5:];
+	animeSearch = ">anime ";
+	songSearch = ">song ";
+
+	if message.content.startswith(animeSearch):
+		messageToSend = message.content[len(animeSearch):];
 		await message.channel.send(messageToSend);	
 
-client.run("NzQzODk3Mjg0ODM1NjcyMTM2.XzbWVQ.RAmfl88LpTWFhO36quIIPwLqkOM");
+client.run(RIRIKSU);
