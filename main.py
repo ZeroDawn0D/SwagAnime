@@ -2,11 +2,13 @@
 from bs4 import BeautifulSoup;
 from bs4 import element as bs4elem;
 import requests;
+import os;
 
 BASE_URL = "https://www.animesonglyrics.com/";
 SEARCH = BASE_URL+"results";
-
+RIRIKSU = os.environ.get("RIRIKSU");
 #Remove newlines and trailing spaces
+
 def removeBreaks(str):
 	newstr = "";
 	for c in str:
@@ -26,7 +28,7 @@ def getNameLink(a):
 
 #uses the page's search function to generate a list of anime or songs
 #and the links to their pages. 
-#generates an array of tuples animeNameLink containing data as (name,link)
+#returns an array of tuples animeNameLink containing data as (name,link)
 def pageSearch(query = "", listtype = "A"): 
 	idType = "";
 	if listtype == "A":
@@ -41,7 +43,6 @@ def pageSearch(query = "", listtype = "A"):
 	soup = BeautifulSoup(r.content, 'html.parser');
 	mainlist = soup.find(id = idType);
 	achild = mainlist.findChildren("a", recursive = "True");
-	global animeNameLink;
 	animeNameLink = [('','')] * len(achild);
 	c = 0;
 	for i in achild:
@@ -49,21 +50,23 @@ def pageSearch(query = "", listtype = "A"):
 		#if listtype == "S":
 		#	nameLink[c] = (formatSongName(nameLink[c][0]),nameLink[c][1]);
 		c+=1;
+	return animeNameLink;
 
 #id #songlist
 # heading -> href = '#'
+#returns an array of tuples songNameLink containing data as (name,link)
 def openAnimePage(pageLink):
 	r = requests.get(pageLink);
 	soup = BeautifulSoup(r.content, 'html.parser');
 	mainlist = soup.find(id = "songlist");
 	achild = mainlist.findChildren("a", recursive = "True");
-	global songNameLink;
 	songNameLink = [('','')] * len(achild);
 	c = 0;
 	for i in achild:
 		songNameLink[c] = getNameLink(i);
 		songNameLink[c] = (' '.join(songNameLink[c][0].split()),songNameLink[c][1]);
 		c+=1;
+	return songNameLink;
 
 # a .SngLnk2 -> song name
 # span .songartist -> a -> artist name
@@ -81,8 +84,8 @@ def extractLyrics(pageLink):
 	return lyricsString;
 
 #generates the array position of Opening, Closing and Other headers
-def showSongList():
-	global OP,ED,OT;
+def headerDataGen(songNameLink):
+	OP = ED = OT = 0;
 	c = 1;
 	for i in songNameLink:
 		if i[1]=='#':
@@ -93,32 +96,40 @@ def showSongList():
 			elif i[0] == "Other Songs":
 				OT = c;
 		c+=1;
+	last = len(songNameLink) - 1;
+	return (OP,ED,OT);
+
+def readSongQuery(query, OPEDOT):
+	(OP,ED,OT) = OPEDOT;
+	pos = -1;
+	ql = query.split();
+	type = ql[0];
+	if type=="OP":
+		pos = OP;
+	elif type=="ED":
+		pos = ED;
+	elif type=="OT";
+		pos = OT;
+	
+	pos += str(ql[1]);
+	return pos;
 
 #--------------------------------X----------------------------------------
 
 
-q = input("ENTER ANIME: ");
-q.strip();
-q = '+'.join(q.split());
 
-pageSearch(q);
+animeNameLink = pageSearch(input("Enter anime: "));
+
 c = 1;
 for i in animeNameLink:
-	print(str(c)+": "+i[0]);
+	print(str(c) + ": " + i[0]);
 	c+=1;
-print('\n');
 
-ch = input("ENTER CHOICE: ");
+songNameLink = openAnimePage(animeNameLink[int(input("Enter choice: "))-1][1]);
 
-openAnimePage(animeNameLink[int(ch)-1][1]);
+c = 1;
+for i in songNameLink:
+	print(str(c) + ": " + i[0]);
+	c+=1;
 
-
-showSongList();
-print('\n');
-
-ch = input("ENTER CHOICE: ");
-
-l = extractLyrics(songNameLink[int(ch)-1][1]);
-
-for i in l:
-	print(i);
+OPEDOT = headerDataGen(songNameLink);
