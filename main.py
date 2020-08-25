@@ -81,6 +81,8 @@ def extractLyrics(pageLink):
 		if(isinstance(i, bs4elem.NavigableString)):
 			lyricsString.append(i);
 	lyricsString[0] = removeBreaks(lyricsString[0]);
+	lyricsString[len(lyricsString)-1] = removeBreaks(lyricsString[len(lyricsString)-1]);
+	lyricsString[len(lyricsString)-2] = removeBreaks(lyricsString[len(lyricsString)-2]);
 	return lyricsString;
 
 #generates the array position of Opening, Closing and Other headers
@@ -89,11 +91,11 @@ def headerDataGen(songNameLink):
 	c = 1;
 	for i in songNameLink:
 		if i[1]=='#':
-			if i[0] == "Opening Themes":
+			if i[0] == "Opening Themes" or i[0] == "Opening Theme":
 				OP = c;
-			elif i[0] == "Ending Themes":
+			elif i[0] == "Ending Themes" or i[0] == "Ending Theme":
 				ED = c;
-			elif i[0] == "Other Songs":
+			elif i[0] == "Other Songs" or i[0] == "Other Song":
 				OT = c;
 		c+=1;
 	last = len(songNameLink) - 1;
@@ -104,32 +106,13 @@ def readSongQuery(query, OPEDOT):
 	pos = -1;
 	ql = query.split();
 	type = ql[0];
-	if type=="OP":
+	if type.upper()=="OP":
 		pos = OP;
-	elif type=="ED":
+	elif type.upper()=="ED":
 		pos = ED;
-	elif type=="OT";
+	elif type.upper()=="OT":
 		pos = OT;
-	
-	pos += str(ql[1]);
+	pos += int(ql[1]);
 	return pos;
 
 #--------------------------------X----------------------------------------
-
-
-
-animeNameLink = pageSearch(input("Enter anime: "));
-
-c = 1;
-for i in animeNameLink:
-	print(str(c) + ": " + i[0]);
-	c+=1;
-
-songNameLink = openAnimePage(animeNameLink[int(input("Enter choice: "))-1][1]);
-
-c = 1;
-for i in songNameLink:
-	print(str(c) + ": " + i[0]);
-	c+=1;
-
-OPEDOT = headerDataGen(songNameLink);
