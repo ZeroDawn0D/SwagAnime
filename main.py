@@ -7,6 +7,7 @@ import os;
 BASE_URL = "https://www.animesonglyrics.com/";
 SEARCH = BASE_URL+"results";
 RIRIKSU = os.environ.get("RIRIKSU");
+
 #Remove newlines and trailing spaces
 
 def removeBreaks(str):

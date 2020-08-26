@@ -17,34 +17,38 @@ getAnime = ">getanime";ga = ">ga"; #get current chosen anime IMPLEMENTED
 
 currentAnimeNameLink = ("","");
 currentSongNameLink = ("","");
+OPEDOT = 0;
+
 
 animeNameLink = list();
 songNameLink = list();
 
+
+
 def currentAnimeFunction():
+	global animeNameLink;
 	messageToSend = "";
 	c = 1;
 	for i in animeNameLink:
 		messageToSend = messageToSend + str(c) + ": "+ i[0] + "\n";
 		c+=1;
-	print("\"" + str(animeNameLink) + "\"");
 	return messageToSend;
 
 def searchFunction(inp):
+	global OPEDOT
+	global animeNameLink;
 	animeNameLink = sc.pageSearch(inp);
-	messageToSend = "";
-	c = 1;
-	for i in animeNameLink:
-		messageToSend = messageToSend + str(c) + ": "+ i[0] + "\n";
-		c+=1;
-	return messageToSend;
+	return currentAnimeFunction();
 
 def getAnimeFunction():
+	global currentAnimeNameLink;
 	messageToSend = currentAnimeNameLink[0];
 	return messageToSend;
 
 def animeFunction(inp):
-	currentAnimeNameLink = animeNameLink[inp-1];
+	global currentAnimeNameLink;
+	global animeNameLink;
+	currentAnimeNameLink = animeNameLink[int(inp)-1];
 	return getAnimeFunction();
 
 
@@ -74,6 +78,16 @@ async def on_message(message):
 
 	if message.content.startswith(ca):
 		messageToSend = currentAnimeFunction();
+		await message.channel.send(messageToSend);
+
+	if message.content.startswith(anime):
+		inp = message.content[len(anime):];
+		messageToSend = animeFunction(inp);
+		await message.channel.send(messageToSend);
+
+	if message.content.startswith(a):
+		inp = message.content[len(a):];
+		messageToSend = animeFunction(inp);
 		await message.channel.send(messageToSend);
 
 
