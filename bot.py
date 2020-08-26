@@ -12,7 +12,7 @@ song = ">song ";s = ">s "; # choose song
 anime = ">anime ";a = ">a "; # choose anime IMPLEMENTED
 currentanime = ">currentanime";ca = ">ca"; #current anime list IMPLEMENTED
 currentsong = ">currentsong"; cs = ">cs"; #current song list
-getAnime = ">getanime";ga = ">ga"; #get current chosen anime IMPLEMENTED
+getanime = ">getanime";ga = ">ga"; #get current chosen anime IMPLEMENTED
 
 
 currentAnimeNameLink = ("","");
@@ -23,6 +23,21 @@ OPEDOT = 0;
 animeNameLink = list();
 songNameLink = list();
 
+def songFunction(inp):
+	global OPEDOT;
+	global currentSongNameLink;
+	global songNameLink;
+	index = sc.readSongQuery(inp, OPEDOT) - 1;
+	currentSongNameLink = songNameLink[index];
+
+	lyr = sc.extractLyrics(currentSongNameLink[1]);
+
+	messageToSend = "";
+
+	for i in lyr:
+		messageToSend = messageToSend + i + "\n";
+
+	return messageToSend;
 
 
 def currentAnimeFunction():
@@ -45,11 +60,28 @@ def getAnimeFunction():
 	messageToSend = currentAnimeNameLink[0];
 	return messageToSend;
 
+def currentSongFunction():
+	global songNameLink;
+	messageToSend = "";
+	c = 1;
+	for i in songNameLink:
+		if i[1]=="#":
+			messageToSend = messageToSend + i[0] + "\n";
+			c = 1;
+		else:
+			messageToSend = messageToSend + str(c) +": "+i[0] + "\n";
+			c+=1;
+
+	return messageToSend;
+
+
 def animeFunction(inp):
 	global currentAnimeNameLink;
 	global animeNameLink;
+	global songNameLink;
 	currentAnimeNameLink = animeNameLink[int(inp)-1];
-	return getAnimeFunction();
+	songNameLink = sc.openAnimePage(currentAnimeNameLink[1]);
+	return currentSongFunction();
 
 
 @client.event
@@ -90,7 +122,30 @@ async def on_message(message):
 		messageToSend = animeFunction(inp);
 		await message.channel.send(messageToSend);
 
+	if message.content.startswith(getanime):
+		messageToSend = getAnimeFunction();
+		await message.channel.send(messageToSend);
 
+	if message.content.startswith(ga):
+		messageToSend = getAnimeFunction();
+		await message.channel.send(messageToSend);
 
+	if message.content.startswith(currentsong):
+		messageToSend = currentSongFunction();
+		await message.channel.send(messageToSend);
+
+	if message.content.startswith(cs):
+		messageToSend = currentSongFunction();
+		await message.channel.send(messageToSend);
+
+	if message.content.startswith(song):
+		inp = message.content[len(song):];
+		messageToSend = songFunction();
+		await message.channel.send(messageToSend);
+
+	if message.content.startswith(s):
+		inp = message.content[len(s):];
+		messageToSend = songFunction();
+		await message.channel.send(messageToSend);
 
 client.run(RIRIKSU);
