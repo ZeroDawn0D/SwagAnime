@@ -1,17 +1,17 @@
 import discord;
 from discord.ext import commands;
 import os;
-import main as sc;
+import scraper as sc;
 
 RIRIKSU = os.environ.get("RIRIKSU");
-client = discord.Client();
+client = commands.Bot(command_prefix= ">");
 
 info = ">info"; i = ">i"; # bot info
-search = ">search "; srch = ">srch "; # anime name search IMPLEMENTED
-song = ">song ";s = ">s "; # choose song
+search = ">search "; srch = ">sr "; # anime name search IMPLEMENTED
+song = ">song ";s = ">s "; # choose song IMPLEMENTED
 anime = ">anime ";a = ">a "; # choose anime IMPLEMENTED
 currentanime = ">currentanime";ca = ">ca"; #current anime list IMPLEMENTED
-currentsong = ">currentsong"; cs = ">cs"; #current song list
+currentsong = ">currentsong"; cs = ">cs"; #current song list IMPLEMENTED
 getanime = ">getanime";ga = ">ga"; #get current chosen anime IMPLEMENTED
 
 
@@ -40,7 +40,7 @@ def songFunction(inp):
 	return messageToSend;
 
 
-def currentAnimeFunction():
+def currentAnimeListFunction():
 	global animeNameLink;
 	messageToSend = "";
 	c = 1;
@@ -50,17 +50,16 @@ def currentAnimeFunction():
 	return messageToSend;
 
 def searchFunction(inp):
-	global OPEDOT
 	global animeNameLink;
 	animeNameLink = sc.pageSearch(inp);
-	return currentAnimeFunction();
+	return currentAnimeListFunction();
 
-def getAnimeFunction():
+def currentAnimeFunction():
 	global currentAnimeNameLink;
 	messageToSend = currentAnimeNameLink[0];
 	return messageToSend;
 
-def currentSongFunction():
+def currentSongListFunction():
 	global songNameLink;
 	messageToSend = "";
 	c = 1;
@@ -79,73 +78,84 @@ def animeFunction(inp):
 	global currentAnimeNameLink;
 	global animeNameLink;
 	global songNameLink;
+	global OPEDOT;
 	currentAnimeNameLink = animeNameLink[int(inp)-1];
 	songNameLink = sc.openAnimePage(currentAnimeNameLink[1]);
-	return currentSongFunction();
+	OPEDOT = sc.headerDataGen(songNameLink);
+	return currentSongListFunction();
 
+def helpFunction():
+	embed = discord.Embed(
+		title = "TEST",
+		description = "TEST DESC",
+		colour  = 0x7c7ccc
+	)
+	return embed;
+
+@client.command()
+async def test(ctx,args):
+	await ctx.send(args);
+
+@client.command()
+async def t(ctx, args):
+	await test(ctx,args);
+
+@client.command()
+async def search(ctx, args):
+	await ctx.send(searchFunction(args));
+
+@client.command()
+async def sr(ctx, args):
+	await search(ctx,args);
+
+@client.command()
+async def currentanimelist(ctx, args):
+	await ctx.send(currentAnimeListFunction(args));
+
+@client.command()
+async def cal(ctx, args):
+	await currentanimelist(ctx,args);
+
+@client.command()
+async def anime(ctx, args):
+	await ctx.send(animeFunction(args));
+
+@client.command()
+async def a(ctx,args):
+	await anime(ctx,args);
+
+@client.command()
+async def song(ctx,args):
+	await ctx.send(songFunction(args));
+
+@client.command()
+async def s(ctx, args):
+	await song(ctx, args);
+
+@client.command()
+async def currentsonglist(ctx,args):
+	await ctx.send(currentSongListFunction)
+
+@client.command()
+async def csl(ctx, args):
+	await currentsonglist(ctx,args);
+
+@client.command()
+async def currentanime(ctx, args):
+	await ctx.send(currentAnimeFunction(args));
+
+@client.command()
+async def ca(ctx, args):
+	await currentanime(ctx, args);
+
+@client.command()
+async def info(ctx, args):
+	pass;
 
 @client.event
 async def on_ready():
 	print("Bot is ready.");
 
-@client.event
-async def on_message(message):
-	if message.author == client.user:
-		return
 
-
-	if message.content.startswith(search):
-		inp = message.content[len(search):];
-		messageToSend = searchFunction(inp)
-		await message.channel.send(messageToSend);
-
-	if message.content.startswith(srch):
-		inp = message.content[len(srch):];
-		messageToSend = searchFunction(inp)
-		await message.channel.send(messageToSend);
-
-	if message.content.startswith(currentanime):
-		messageToSend = currentAnimeFunction();
-		await message.channel.send(messageToSend);
-
-	if message.content.startswith(ca):
-		messageToSend = currentAnimeFunction();
-		await message.channel.send(messageToSend);
-
-	if message.content.startswith(anime):
-		inp = message.content[len(anime):];
-		messageToSend = animeFunction(inp);
-		await message.channel.send(messageToSend);
-
-	if message.content.startswith(a):
-		inp = message.content[len(a):];
-		messageToSend = animeFunction(inp);
-		await message.channel.send(messageToSend);
-
-	if message.content.startswith(getanime):
-		messageToSend = getAnimeFunction();
-		await message.channel.send(messageToSend);
-
-	if message.content.startswith(ga):
-		messageToSend = getAnimeFunction();
-		await message.channel.send(messageToSend);
-
-	if message.content.startswith(currentsong):
-		messageToSend = currentSongFunction();
-		await message.channel.send(messageToSend);
-
-	if message.content.startswith(cs):
-		messageToSend = currentSongFunction();
-		await message.channel.send(messageToSend);
-
-	if message.content.startswith(song):
-		inp = message.content[len(song):];
-		messageToSend = songFunction();
-		await message.channel.send(messageToSend);
-
-	if message.content.startswith(s):
-		inp = message.content[len(s):];
-		messageToSend = songFunction();
-		await message.channel.send(messageToSend);
 
 client.run(RIRIKSU);
