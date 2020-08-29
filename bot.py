@@ -5,7 +5,7 @@ import scraper as sc;
 
 RIRIKSU = os.environ.get("RIRIKSU");
 client = commands.Bot(command_prefix= ">");
-
+COLOUR = 0x7c7ccc;
 info = ">info"; i = ">i"; # bot info
 search = ">search "; srch = ">sr "; # anime name search IMPLEMENTED
 song = ">song ";s = ">s "; # choose song IMPLEMENTED
@@ -37,7 +37,12 @@ def songFunction(inp):
 	for i in lyr:
 		messageToSend = messageToSend + i + "\n";
 
-	return messageToSend;
+	embed = discord.Embed(
+		title = "Song",
+		description = messageToSend,
+		colour  = COLOUR
+	)
+	return embed;
 
 
 def currentAnimeListFunction():
@@ -47,17 +52,28 @@ def currentAnimeListFunction():
 	for i in animeNameLink:
 		messageToSend = messageToSend + str(c) + ": "+ i[0] + "\n";
 		c+=1;
-	return messageToSend;
+	embed = discord.Embed(
+		title = "Current Anime List",
+		description = messageToSend,
+		colour  = COLOUR
+	)
+	return embed;
 
 def searchFunction(inp):
 	global animeNameLink;
 	animeNameLink = sc.pageSearch(inp);
 	return currentAnimeListFunction();
 
+
 def currentAnimeFunction():
 	global currentAnimeNameLink;
 	messageToSend = currentAnimeNameLink[0];
-	return messageToSend;
+	embed = discord.Embed(
+		title = "Current Anime",
+		description = messageToSend,
+		colour  = COLOUR
+	)
+	return embed;
 
 def currentSongListFunction():
 	global songNameLink;
@@ -71,7 +87,12 @@ def currentSongListFunction():
 			messageToSend = messageToSend + str(c) +": "+i[0] + "\n";
 			c+=1;
 
-	return messageToSend;
+	embed = discord.Embed(
+		title = "Current Song List",
+		description = messageToSend,
+		colour  = COLOUR
+	)
+	return embed;
 
 
 def animeFunction(inp):
@@ -93,16 +114,8 @@ def helpFunction():
 	return embed;
 
 @client.command()
-async def test(ctx,args):
-	await ctx.send(args);
-
-@client.command()
-async def t(ctx, args):
-	await test(ctx,args);
-
-@client.command()
 async def search(ctx, args):
-	await ctx.send(searchFunction(args));
+	await ctx.send(embed = searchFunction(args));
 
 @client.command()
 async def sr(ctx, args):
@@ -110,7 +123,7 @@ async def sr(ctx, args):
 
 @client.command()
 async def currentanimelist(ctx, args):
-	await ctx.send(currentAnimeListFunction(args));
+	await ctx.send(embed = currentAnimeListFunction(args));
 
 @client.command()
 async def cal(ctx, args):
@@ -118,7 +131,7 @@ async def cal(ctx, args):
 
 @client.command()
 async def anime(ctx, args):
-	await ctx.send(animeFunction(args));
+	await ctx.send(embed = animeFunction(args));
 
 @client.command()
 async def a(ctx,args):
@@ -126,7 +139,7 @@ async def a(ctx,args):
 
 @client.command()
 async def song(ctx,args):
-	await ctx.send(songFunction(args));
+	await ctx.send(embed = songFunction(args));
 
 @client.command()
 async def s(ctx, args):
@@ -134,7 +147,7 @@ async def s(ctx, args):
 
 @client.command()
 async def currentsonglist(ctx,args):
-	await ctx.send(currentSongListFunction)
+	await ctx.send(embed = currentSongListFunction(args));
 
 @client.command()
 async def csl(ctx, args):
@@ -142,7 +155,7 @@ async def csl(ctx, args):
 
 @client.command()
 async def currentanime(ctx, args):
-	await ctx.send(currentAnimeFunction(args));
+	await ctx.send(embed = currentAnimeFunction(args));
 
 @client.command()
 async def ca(ctx, args):
